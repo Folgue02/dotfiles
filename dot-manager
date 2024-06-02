@@ -1,0 +1,163 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use feature "say";
+
+use File::Spec::Functions qw(catfile);
+use Cwd qw(abs_path);
+use File::Copy qw(move);
+use File::Basename qw(dirname);
+
+my $HOME = $ENV{HOME};
+my $SCRIPTWD = dirname($0);
+
+# ###########
+# UTILS
+# ###########
+
+sub enter_to_continue {
+    print "Press <Enter> to continue...";
+    <STDIN>;
+}
+
+
+sub yes_no {
+    my $msg = shift || "Are you sure?";
+
+    while (1) {
+        print "$msg (Y/N) ";
+        chomp(my $response = <STDIN>);
+
+        if (lc($msg) eq "y") {
+            return 1;
+        } elsif (lc($msg) ne "n") {
+            return 0;
+        } else {
+            next;
+        }
+    }
+}
+
+# ############
+# END OF UTILS
+# ############
+
+# ############
+# FUNCTIONS
+# ############
+
+sub new_configuration($) {
+    my $directory = shift;
+
+    if (! -d $directory) {
+        die "[new_configuration]: The given configuration path doesn't exist: '$directory'";
+    }
+
+    $directory = abs_path($directory);
+    my $target = substr($directory, length($HOME) + 1);
+    say "Moving '$directory' -> '$target'...";
+    move $directory, $target;
+}
+
+sub stow_all {
+    for (<*>) {
+        if (-d $_) {
+            say "Stowing '$_'...";
+            system("stow $_") == 0 or die "Couldn't stow: $!";
+        }
+    }
+}
+
+# ############
+# END OF FUNCTIONS
+# ############
+
+sub new_configuration_interactive {
+    my $choice = "";
+    my $tail = "";
+    while (1) {
+        if (length $choice ne 0) {
+            say "Invalid!";
+        }
+        print "Where is the new configuration stored?\n> $HOME/";
+        chomp(my $tail = <STDIN>);
+        # TODO: /home/folgue/dotfiles -> /home/folgue/dotfiles/
+        my $choice = catfile $HOME, $tail;
+
+        if (! -d $choice) {
+            say "It's not a directory!";
+        } elsif (index($choice, $HOME) ne 0) {
+            say "'$choice' outside of home directory ('$HOME')";
+        } elsif (length($choice) eq 0) {
+            say "Cannot be empty";
+        } else {
+            last;
+        }
+    }
+    $choice = abs_path($choice);
+
+    # TODO: Wrong
+    my $target = abs_path(catfile($SCRIPTWD, $tail));
+    if (yes_no("Are you sure you want to move '$choice' into '$target'?") eq 0) {
+        new_configuration $choice;
+        say "Done!";
+    } else {
+        say "Aborted";
+    }
+}
+
+
+sub general_menu {
+    my $MENU_STRING = "
+┌──────────────────────────────────────┐
+│    ____      _   _____ _ _           │
+│   |    \\ ___| |_|   __|_| |___ ___   │
+│   |  |  | . |  _|   __| | | -_|_ -|  │
+│   |____/|___|_| |__|  |_|_|___|___|  │
+│    _____                             │
+│   |     |___ ___ ___ ___ ___ ___     │
+│   | | | | .'|   | .'| . | -_|  _|    │
+│   |_|_|_|__,|_|_|__,|_  |___|_|      │
+│                     |___|            │
+│                                      │
+└──────────────────────────────────────┘
+│                                      │
+│  Please choose an option:            │
+│                                      │
+│  [1] ➕ Store new configuration      │
+│  [2] ❌ Remove configuration         │
+│  [3] ✅ Stow all configurations      │
+│  [4] 🧰 Interactive stowing          │
+│  [5] 🚪 Exit                         │
+│                                      │
+└──────────────────────────────────────┘
+┌───────────────────────────────────────
+│ Choose an option > ";
+    my $choice = "";
+    
+    while (1) {
+        system("clear");
+        print $MENU_STRING;
+
+        my $choice = <STDIN>;
+        chomp $choice;
+
+        if ($choice eq 1) {
+            new_configuration_interactive;
+        } elsif ($choice eq 2) {
+            say "WIP!";
+        } elsif ($choice eq 3) {
+            stow_all;
+        } elsif ($choice eq 4) {
+            say "WIP!";
+        } elsif ($choice eq 5) {
+            say "Bye!\n";
+            exit 0;
+        } else {
+            print "Invalid option!";
+        }
+        enter_to_continue;
+    }
+}
+
+general_menu;

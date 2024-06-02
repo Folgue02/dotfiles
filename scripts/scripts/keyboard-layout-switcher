@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+from typing import Any
+from os import system
+import os
+
+EXCHANGE_FILE = os.path.join(os.getenv("HOME"), ".current-layout")
+
+LAYOUTS = [
+    "us",
+    "es"
+]
+
+def create_default_exchange_file():
+    f = open(EXCHANGE_FILE, 'w')
+    f.write("0")
+    f.close()
+
+def read_exchange_file() -> int:
+    f = open(EXCHANGE_FILE, 'r')
+    contents = f.read()
+    f.close()
+
+    value = 0
+    try:
+        value = int(contents)
+    except:
+        ...
+
+    if value >= len(LAYOUTS):
+        return 0
+
+    return value
+
+def write_to_exchange_file(contents: Any):
+    f = open(EXCHANGE_FILE, 'w')
+    f.write(str(contents))
+    f.close()
+
+def main():
+    if not os.path.exists(EXCHANGE_FILE):
+        create_default_exchange_file()
+
+    layout_index = read_exchange_file() + 1
+    if layout_index >= len(LAYOUTS):
+        layout_index = 0
+
+    cmd = f"hyprctl keyword input:kb_layout {LAYOUTS[layout_index]}"
+    write_to_exchange_file(layout_index)
+    print(f"Executing cmd: {cmd}")
+    system(cmd)
+
+if __name__ == "__main__":
+    main()
