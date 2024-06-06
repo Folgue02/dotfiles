@@ -88,7 +88,7 @@ source $ZSH/oh-my-zsh.sh
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 
-export PATH="$PATH:$HOME/.cargo/bin:$HOME/scripts:$HOME/.dotnet/tools/"
+export PATH="$PATH:$HOME/.cargo/bin:$HOME/scripts:$HOME/.dotnet/tools/:$HOME/.cargo/bin"
 
 # Preferred editor for local and remote sessions
 # if [[ -n $SSH_CONNECTION ]]; then
@@ -124,7 +124,11 @@ function jabu-repo-server() {
 # Aliases
 alias kssh="kitten ssh"
 alias jabu-server="cd $HOME/source/rust/jabu-workspace/jabu-repo-server"
-alias ls="exa -la"
+if output=$(which exa); then
+    alias ls="exa -l"
+else
+    alias ls="ls -la"
+fi
 
 # Functions
 function mkcd() {
@@ -135,5 +139,4 @@ function mkcd() {
 # Env vars
 export EDITOR=$(which nvim)
 export DOTNET_ROOT="$HOME/.dotnet/"
-
-
+export JAVA_HOME="/usr/lib/jvm/default/"
