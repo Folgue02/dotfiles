@@ -6,7 +6,18 @@ mason.setup({})
 -- Relevant ones
 lspconfig.gopls.setup {}
 lspconfig.jdtls.setup {}
-lspconfig.rust_analyzer.setup {}
+lspconfig.rust_analyzer.setup {
+    settings = {
+         ["rust-analyzer"] = {
+            completion = {
+                addCallArgumentSnippets = false,
+                postfix = {
+                    enable = false,
+                },
+            },
+        },
+    }
+}
 lspconfig.lua_ls.setup {}
 lspconfig.perlpls.setup {}
 
