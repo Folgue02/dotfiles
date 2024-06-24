@@ -125,7 +125,7 @@ function jabu-repo-server() {
 alias kssh="kitten ssh"
 alias jabu-server="cd $HOME/source/rust/jabu-workspace/jabu-repo-server"
 if output=$(which exa); then
-    alias ls="exa -l"
+    alias ls="exa -la"
 else
     alias ls="ls -la"
 fi

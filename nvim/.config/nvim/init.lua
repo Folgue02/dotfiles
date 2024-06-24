@@ -68,7 +68,8 @@ require('lazy').setup({
     "vim-crystal/vim-crystal",
     "alaviss/nim.nvim",
     "jidn/vim-dbml",
-    "rhaiscript/vim-rhai"
+    "rhaiscript/vim-rhai",
+    "ron-rs/ron.vim"
 })
 
 -- TODO: Fix keymapping not working.
@@ -159,7 +160,7 @@ cmp.setup {
         { name = "path" },
     },
     experimental = {
-        ghost_text = true
+        ghost_text = false -- true
     },
     snippet = {
         expand = function(args)

@@ -23,6 +23,7 @@ lspconfig.perlpls.setup {}
 
 lspconfig.pyright.setup {}
 lspconfig.bashls.setup {}
+lspconfig.tsserver.setup {}
 
 -- Occasional
 lspconfig.cssls.setup {}
