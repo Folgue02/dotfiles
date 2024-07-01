@@ -9,7 +9,7 @@ my %SHEBANG_SHORTCUTS = (
     python => "#!/usr/bin/env python3",
     bash => "#!/bin/bash",
     sh => "#!/bin/sh",
-    perl => "#!/usr/bin/perl\nuse strict;\nuse warnings;\n\n"
+    perl => "#!/usr/bin/perl\nuse strict;\nuse warnings;\nuse autodie;\nuse feature 'say';\n\n"
 );
 
 sub usage {

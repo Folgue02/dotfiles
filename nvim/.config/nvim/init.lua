@@ -38,8 +38,8 @@ require('lazy').setup({
     {
         "nyoom-engineering/nyoom.nvim",
         "Mofiqul/vscode.nvim",
+        'blazkowolf/gruber-darker.nvim',
         config = function()
-            --vim.cmd [[ colorscheme lunaperche ]]
             vim.cmd [[ colorscheme vscode ]]
         end
     },
@@ -64,12 +64,10 @@ require('lazy').setup({
 
     -- Language specific stuff
     "rust-lang/rust.vim",
-    "Tetralux/odin.vim",
-    "vim-crystal/vim-crystal",
-    "alaviss/nim.nvim",
     "jidn/vim-dbml",
     "rhaiscript/vim-rhai",
-    "ron-rs/ron.vim"
+    'ron-rs/ron.vim',
+    'mustache/vim-mustache-handlebars'
 })
 
 -- TODO: Fix keymapping not working.
