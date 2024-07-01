@@ -6,10 +6,13 @@ use feature "say";
 use File::Spec::Functions qw(catfile);
 use Cwd qw(abs_path);
 use File::Copy qw(move);
-use File::Basename qw(dirname);
+use File::Path qw(rmtree);
+use File::Basename qw(dirname basename);
+use Term::ANSIColor qw(colored);
 
 my $HOME = $ENV{HOME};
 my $SCRIPTWD = dirname($0);
+my $VERSION = 0.1;
 
 # ###########
 # UTILS
@@ -20,22 +23,25 @@ sub enter_to_continue {
     <STDIN>;
 }
 
-
 sub yes_no {
     my $msg = shift || "Are you sure?";
+    my $clean_after = shift || 0;
 
     while (1) {
         print "$msg (Y/N) ";
         chomp(my $response = <STDIN>);
 
-        if (lc($msg) eq "y") {
+        if (lc($response) eq "y") {
+            print "\033[1A\033[K" if $clean_after;
             return 1;
-        } elsif (lc($msg) ne "n") {
+        } elsif (lc($response) eq "n") {
+            print "\033[1A\033[K" if $clean_after;
             return 0;
         } else {
             next;
         }
     }
+
 }
 
 # ############
@@ -46,43 +52,83 @@ sub yes_no {
 # FUNCTIONS
 # ############
 
+sub stow_config {
+    my $package_name = shift;
+    my $stow_flags = shift || "";
+
+    say "Stowing '$package_name'...";
+    system("stow $stow_flags $package_name") == 0 or die "Couldn't stow '$package_name': $!";
+}
+
 sub new_configuration($) {
-    my $directory = shift;
+    # i.e. /home/user/.config/nvim
+    my $dir_to_stow = shift;
+    # i.e. nvim
+    my $package_name = basename $dir_to_stow;
+    # i.e. .config
+    my $package_stem = substr dirname($dir_to_stow), length($HOME) + 1;
+    # i.e. /home/user/dotfiles/nvim/.config/
+    my $package_dir = catfile $SCRIPTWD, $package_name;
 
-    if (! -d $directory) {
-        die "[new_configuration]: The given configuration path doesn't exist: '$directory'";
+    say "Dir to stow: (/home/user/.config/nvim) $dir_to_stow";
+    say "Package name: (nvim) $package_name";
+    say "Package stem: (.config) $package_stem";
+
+    if (! -d $dir_to_stow) {
+        die "[new_configuration]: The given configuration path doesn't exist: '$dir_to_stow'";
     }
 
-    $directory = abs_path($directory);
-    my $target = substr($directory, length($HOME) + 1);
-    say "Moving '$directory' -> '$target'...";
-    move $directory, $target;
+    mkdir $package_dir;
+    say "Moving '$dir_to_stow' -> '$package_dir'";
+    move $dir_to_stow, $package_dir;
+    stow_config $package_name, "-R";
 }
 
-sub stow_all {
-    for (<*>) {
-        if (-d $_) {
-            say "Stowing '$_'...";
-            system("stow $_") == 0 or die "Couldn't stow: $!";
-        }
-    }
-}
 
 # ############
 # END OF FUNCTIONS
 # ############
 
+sub stow_all {
+    my $interactive = shift || 0;
+    my $stow_flags = "";
+
+    if ($interactive && yes_no("In case there are previous configurations, do you want to COMPLETELY override them? ")) {
+        $stow_flags = "-D -S ";
+    }
+
+    for (<./*>) {
+        stow_config $_, $stow_flags if (-d $_);
+    }
+}
+
+sub stow_interactive {
+    my $stow_flags = "";
+    if (yes_no("In case there are previous configurations, do you want to COMPLETELY override them? ")) {
+        $stow_flags = "-D -S ";
+    }
+
+    for (<*>) {
+        next if (! -d $_);
+        if (yes_no "Do you want to stow package with name '$_'? ", 1) {
+            stow_config $_;
+            say colored("Package with name '$_' stowed.", "green");
+        } else {
+            say colored("Package '$_' skipped.", "yellow");
+        }
+    }
+}
+
 sub new_configuration_interactive {
     my $choice = "";
-    my $tail = "";
+    my $package_tail = "";
     while (1) {
-        if (length $choice ne 0) {
+        if (length($choice) ne 0) {
             say "Invalid!";
         }
         print "Where is the new configuration stored?\n> $HOME/";
-        chomp(my $tail = <STDIN>);
-        # TODO: /home/folgue/dotfiles -> /home/folgue/dotfiles/
-        my $choice = catfile $HOME, $tail;
+        chomp(my $package_tail = <STDIN>);
+        $choice = catfile $HOME, $package_tail;
 
         if (! -d $choice) {
             say "It's not a directory!";
@@ -91,18 +137,46 @@ sub new_configuration_interactive {
         } elsif (length($choice) eq 0) {
             say "Cannot be empty";
         } else {
+            say "You've specified this directory: $choice";
             last;
         }
     }
-    $choice = abs_path($choice);
 
     # TODO: Wrong
-    my $target = abs_path(catfile($SCRIPTWD, $tail));
-    if (yes_no("Are you sure you want to move '$choice' into '$target'?") eq 0) {
+    my $target = abs_path(catfile($SCRIPTWD, $package_tail));
+    if (yes_no("Are you sure you want to move '$choice' into '$target'?")) {
         new_configuration $choice;
         say "Done!";
     } else {
         say "Aborted";
+    }
+}
+
+sub remove_configuration_interactive {
+    my $count = 0;
+    for (<*>) {
+        if (-d $_) {
+            $count++;
+            say "[$count]: $_";
+        }
+    }
+
+    while (1) {
+        print "What configuration do you want to remove? (type ';none' to leave) ";
+        chomp(my $pkg_name = <STDIN>);
+        last if $pkg_name eq ';none';
+
+        my $pkg_path = catfile $SCRIPTWD, $pkg_name;
+        
+
+        if (! -d $pkg_path) {
+            say "'$pkg_name' doesn't seem to point to a package"; 
+            next;
+        } elsif (yes_no "Are you sure you want to " . colored("COMPLETELY", "red") .  " remove '$pkg_name'? ") {
+            system("stow -D $pkg_name");
+            rmtree catfile(dirname($0), $pkg_name); 
+            say "Package '$pkg_name' removed";
+        } 
     }
 }
 
@@ -119,7 +193,7 @@ sub general_menu {
 │   | | | | .'|   | .'| . | -_|  _|    │
 │   |_|_|_|__,|_|_|__,|_  |___|_|      │
 │                     |___|            │
-│                                      │
+│                             v$VERSION     │
 └──────────────────────────────────────┘
 │                                      │
 │  Please choose an option:            │
@@ -136,20 +210,24 @@ sub general_menu {
     my $choice = "";
     
     while (1) {
-        system("clear");
+        system "clear";
         print $MENU_STRING;
 
         my $choice = <STDIN>;
         chomp $choice;
 
         if ($choice eq 1) {
+            # Store new configuration
             new_configuration_interactive;
         } elsif ($choice eq 2) {
-            say "WIP!";
+            # Remove configuration
+            remove_configuration_interactive;
         } elsif ($choice eq 3) {
+            # Stow all configurations
             stow_all;
         } elsif ($choice eq 4) {
-            say "WIP!";
+            # Interactive stowing
+            stow_interactive;
         } elsif ($choice eq 5) {
             say "Bye!\n";
             exit 0;
@@ -157,6 +235,19 @@ sub general_menu {
             print "Invalid option!";
         }
         enter_to_continue;
+    }
+}
+
+# ########################
+# INIT
+# ########################
+
+if (! `which stow`) {
+    if (yes_no colored("WARNING: ", "red") . "'stow' wasn't found, do you wanna install it with pacman? ") {
+        system("pacman -S stow");
+        say colored("Done.", "green");
+    } else {
+        die "This script cannot work without stow installed.";
     }
 }
 
