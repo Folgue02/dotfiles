@@ -20,6 +20,7 @@ lspconfig.rust_analyzer.setup {
 }
 lspconfig.lua_ls.setup {}
 lspconfig.perlpls.setup {}
+lspconfig.dockerls.setup {}
 
 lspconfig.pyright.setup {}
 lspconfig.bashls.setup {}

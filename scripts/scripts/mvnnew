@@ -1,0 +1,77 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use autodie;
+use feature 'say';
+
+use Getopt::Long qw(GetOptions);
+use Term::ANSIColor qw(colored);
+use File::Basename qw(basename dirname);
+use File::Spec::Functions;
+use File::Slurp qw(write_file);
+use Cwd qw(cwd);
+
+my $RUN_SCRIPT = '#!/usr/bin/env perl
+use strict;
+use warnings;
+use autodie;
+use feature \'say\';
+
+system(\'mvn package\');
+system("java -jar target/*.jar");
+';
+
+=pod
+Displays a message in a red color, and then terminates the execution with either
+the given code, or 1 by default.
+=cut
+sub quit {
+    my $msg = shift;
+    my $code = shift // 1;
+    say colored("red", $msg);
+    exit $code;
+}
+
+# ================
+# Argument parsing
+# ================
+my $group;
+my $artifact;
+my $help;
+GetOptions(
+    "group|g=s" => \$group,
+    "artifact|a=s" => \$artifact,
+    "help|h" => \$help
+);
+
+if ($help) {
+    say "DESCRIPTION:\n\tGenerates a Maven project with the following options:";
+    say basename($0) . " --group|-g <group_id> --artifact|a <artifact_id>";
+    exit 0;
+}
+
+quit "No group specified" unless $group;
+quit "No artifact id specified" unless $artifact;
+
+# ====================
+# Generate the project
+# using mvn.
+# ====================
+
+my $cmd = "mvn archetype:generate -DgroupId=$group -DartifactId=$artifact -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false";
+say "About to run the following command: \"$cmd\"";
+my $exit_code = system $cmd;
+
+quit "Operation failed with code '$exit_code'" if $exit_code;
+say colored(["green"], "Done.");
+
+# ====================
+# Generate script.
+# using mvn.
+# ====================
+
+my $project_dir = catfile cwd, $artifact;
+my $run_script_path = catfile($project_dir, "scripts", "run");
+mkdir catfile($project_dir, "scripts");
+write_file $run_script_path, $RUN_SCRIPT;
+chmod 0755, $run_script_path;

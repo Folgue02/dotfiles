@@ -122,6 +122,7 @@ function jabu-repo-server() {
 }
 
 # Aliases
+alias neofetch=fastfetch
 alias kssh="kitten ssh"
 alias jabu-server="cd $HOME/source/rust/jabu-workspace/jabu-repo-server"
 if output=$(which exa); then

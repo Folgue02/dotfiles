@@ -67,7 +67,8 @@ require('lazy').setup({
     "jidn/vim-dbml",
     "rhaiscript/vim-rhai",
     'ron-rs/ron.vim',
-    'mustache/vim-mustache-handlebars'
+    'mustache/vim-mustache-handlebars',
+    'mfussenegger/nvim-jdtls'
 })
 
 -- TODO: Fix keymapping not working.

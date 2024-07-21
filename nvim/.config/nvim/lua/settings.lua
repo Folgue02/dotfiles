@@ -8,4 +8,4 @@ vim.g.mapleader = " "
 
 vim.opt.guicursor = "i:block"
 
-
+vim.cmd [[ colorscheme gruber-darker ]]
