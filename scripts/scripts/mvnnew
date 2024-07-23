@@ -9,17 +9,9 @@ use Term::ANSIColor qw(colored);
 use File::Basename qw(basename dirname);
 use File::Spec::Functions;
 use File::Slurp qw(write_file);
+use File::Path qw(make_path);
 use Cwd qw(cwd);
 
-my $RUN_SCRIPT = '#!/usr/bin/env perl
-use strict;
-use warnings;
-use autodie;
-use feature \'say\';
-
-system(\'mvn package\');
-system("java -jar target/*.jar");
-';
 
 =pod
 Displays a message in a red color, and then terminates the execution with either
@@ -30,6 +22,114 @@ sub quit {
     my $code = shift // 1;
     say colored("red", $msg);
     exit $code;
+}
+
+sub create_project($$$) {
+    my ($group, $artifact, $path) = @_;
+    my $pom = "
+    <project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
+         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd\">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>$group</groupId>
+    <artifactId>$artifact</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>$artifact</name>
+    <url>http://maven.apache.org</url>
+
+    <properties>
+        <maven.compiler.target>22</maven.compiler.target>
+        <maven.compiler.source>22</maven.compiler.source>
+        <exec.mainClass>$group.$artifact.App</exec.mainClass>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>
+                            jar-with-dependencies
+                        </descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass>\${exec.mainClass}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>	    
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.34</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+</project>
+";
+    my $project_dir = catfile $path, $artifact;
+    my $pom_file = catfile $project_dir, "pom.xml";
+    my $package_path = catfile $project_dir, "src", "main", "java", $group =~ s/\./ /gr;
+    make_path $_, { verbose => 1, mode => 0755 } for (
+        $package_path,
+        catfile($project_dir, "src", "main", "resources"),
+        catfile($project_dir, "src", "test", "java"),
+        catfile($project_dir, "target")
+    );
+    
+    write_file catfile($package_path, "App.java"), "package $group.$artifact;
+
+public class App {
+    public static void main(String[] args) {
+        System.out.println(\"Hello World\");
+    }
+}";
+    write_file catfile($project_dir, "pom.xml"), $pom;
+}
+
+sub create_script($) {
+    my $project_dir = shift;
+    my $run_script = "#!/usr/bin/env perl
+use strict;
+use warnings;
+use autodie;
+use feature \'say\';
+
+my \$args = \"\";
+\$args .= ' \"' . \$_ . '\" ' for \@ARGV;
+
+
+say 'Packaging...';
+system(\'mvn package\');
+say \"==> Running with the following args: \$args\";
+system(\"java -jar target/*-jar-with-dependencies.jar \$args\");
+";
+    my $run_script_path = catfile($project_dir, "scripts", "run");
+    mkdir catfile($project_dir, "scripts");
+    write_file $run_script_path, $run_script;
+    chmod 0755, $run_script_path;
 }
 
 # ================
@@ -53,25 +153,8 @@ if ($help) {
 quit "No group specified" unless $group;
 quit "No artifact id specified" unless $artifact;
 
-# ====================
-# Generate the project
-# using mvn.
-# ====================
-
-my $cmd = "mvn archetype:generate -DgroupId=$group -DartifactId=$artifact -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false";
-say "About to run the following command: \"$cmd\"";
-my $exit_code = system $cmd;
-
-quit "Operation failed with code '$exit_code'" if $exit_code;
-say colored(["green"], "Done.");
-
-# ====================
-# Generate script.
-# using mvn.
-# ====================
-
 my $project_dir = catfile cwd, $artifact;
-my $run_script_path = catfile($project_dir, "scripts", "run");
-mkdir catfile($project_dir, "scripts");
-write_file $run_script_path, $RUN_SCRIPT;
-chmod 0755, $run_script_path;
+
+# Create the project & script
+create_project $group, $artifact, cwd;
+create_script $project_dir;
