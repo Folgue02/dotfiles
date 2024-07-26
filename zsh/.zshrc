@@ -5,9 +5,6 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
-
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
@@ -88,7 +85,7 @@ source $ZSH/oh-my-zsh.sh
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 
-export PATH="$PATH:$HOME/.cargo/bin:$HOME/scripts:$HOME/.dotnet/tools/:$HOME/.cargo/bin:$HOME/.sdkman"
+export PATH="$PATH:$HOME/.cargo/bin:$HOME/scripts:$HOME/.dotnet/tools/:$HOME/.cargo/bin:$HOME/.sdkman:$HOME/.jumrepo/bin/"
 
 # Preferred editor for local and remote sessions
 # if [[ -n $SSH_CONNECTION ]]; then
@@ -122,7 +119,7 @@ function jabu-repo-server() {
 }
 
 # Aliases
-alias neofetch=fastfetch
+alias neofetch="fastfetch --logo DarkOS"
 alias kssh="kitten ssh"
 alias jabu-server="cd $HOME/source/rust/jabu-workspace/jabu-repo-server"
 if output=$(which exa); then

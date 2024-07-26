@@ -91,7 +91,7 @@ sub create_project($$$) {
 ";
     my $project_dir = catfile $path, $artifact;
     my $pom_file = catfile $project_dir, "pom.xml";
-    my $package_path = catfile $project_dir, "src", "main", "java", $group =~ s/\./ /gr;
+    my $package_path = catfile $project_dir, "src", "main", "java", $group =~ s/\./\//gr, $artifact;
     make_path $_, { verbose => 1, mode => 0755 } for (
         $package_path,
         catfile($project_dir, "src", "main", "resources"),

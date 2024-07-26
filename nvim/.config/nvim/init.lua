@@ -61,6 +61,7 @@ require('lazy').setup({
         "hrsh7th/cmp-nvim-lsp",
         "hrsh7th/vim-vsnip-integ"
     },
+    "norcalli/nvim-colorizer.lua",
 
     -- Language specific stuff
     "rust-lang/rust.vim",
@@ -197,3 +198,8 @@ require('lualine').setup {
     inactive_winbar = {},
     extensions = {}
 }
+
+-- ===========
+-- COLORIZER
+-- ===========
+require('colorizer').setup()
