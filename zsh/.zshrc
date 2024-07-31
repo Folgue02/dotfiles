@@ -119,7 +119,7 @@ function jabu-repo-server() {
 }
 
 # Aliases
-alias neofetch="fastfetch --logo DarkOS"
+alias neofetch="fastfetch --logo trisquel"
 alias kssh="kitten ssh"
 alias jabu-server="cd $HOME/source/rust/jabu-workspace/jabu-repo-server"
 if output=$(which exa); then
