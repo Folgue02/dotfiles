@@ -1,0 +1,53 @@
+#!/bin/perl
+use strict;
+use warnings;
+
+use File::Basename;
+use File::Path qw(make_path);
+
+my %SHEBANG_SHORTCUTS = (
+    python => "#!/usr/bin/env python3",
+    bash => "#!/bin/bash",
+    sh => "#!/bin/sh",
+    perl => "#!/usr/bin/perl\nuse strict;\nuse warnings;\nuse autodie;\nuse feature 'say';\n\n"
+);
+
+sub usage {
+    my $script_name = basename($0);
+    print <<USAGE;
+$script_name [NAME] [SHEBANG OR SHORTCUT]
+
+DESCRIPTION
+    Creates a file, gives it a shebang and makes it executable (chmod +x \$file)
+
+EXAMPLES
+    \$ $script_name ./perl_file /bin/perl
+    \$ $script_name ./pike_script /usr/local/bin/pike
+    \$ $script_name ./perl_file_shortcut perl         # No need to put a shebang (shortcut available)
+    \$ $script_name ./python_file_shortcut python     # No need to put a shebang (shortcut available)
+USAGE
+}
+
+sub create_script {
+    my $filename = shift;
+    my $shebang = shift;
+
+    if (exists $SHEBANG_SHORTCUTS{$shebang}) {
+        $shebang = $SHEBANG_SHORTCUTS{$shebang};
+    } else {
+        $shebang = "#!$shebang";
+    }
+
+    make_path dirname($filename);
+    open(my $file, ">", $filename) or die "Couldn't open the script";
+    print $file $shebang;
+    close $file;
+    chmod 0744, $filename;
+}
+
+if ($#ARGV + 1 lt 2) {
+    usage;
+    die "Not enough arguments specified (2 required, $#ARGV specified.";
+} else {
+    create_script $ARGV[0], $ARGV[1];
+}

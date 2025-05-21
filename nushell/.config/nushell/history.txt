@@ -1,0 +1,51 @@
+mv ~/.config/nushell nushell/.config
+ls
+exit
+nu
+stow nushell
+stow nushell --adopt
+exit
+nu
+git status
+ls
+ls alacritty
+ls scripts
+ls
+ls scripts
+ls
+rm scripts/bris
+rm scripts/scripts/bris
+bris -h
+ls ~/.cargo/bin/fd
+~/.cargo/bin/fd -h
+clear
+ls
+exa
+eza
+which eza
+which exa
+file (which exa | select path)
+(which exa).0.path
+file (which exa).0.path
+eza -h
+eza --help
+git status
+ls wofi/.config/wofi/
+rm -rf wofi
+mkdir wofi/.config/
+mv wofi/.config/wofi wofi/.config
+mv ~/.config/wofi wofi/.config
+stow wofi
+ls
+ls zsh
+rm -rf zsh
+mkdir zsh
+mv ~/.zshrc zsh
+zsh
+ls
+stow zsh
+ls
+rm -rf dot-manager
+ls
+zeditor README.md
+git status
