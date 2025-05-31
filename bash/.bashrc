@@ -128,3 +128,5 @@ function goto() {
     fi
 }
 
+
+export PATH=$PATH:/home/folgue/.spicetify

@@ -13,5 +13,17 @@ lvim.builtin.cmp.sources = {
   --{ name = 'buffer' }
 }
 
--- Options
+-- ---------------------
+-- Appearance
+-- ---------------------
 vim.opt.relativenumber = true
+
+-- Transparent background
+lvim.transparent_window = true
+
+-- No curr line highlighting
+vim.opt.cursorline = false
+
+-- Cursor
+vim.opt.guicursor = "i:block"
+

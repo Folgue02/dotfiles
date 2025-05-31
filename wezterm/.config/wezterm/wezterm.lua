@@ -3,7 +3,7 @@ local wezterm = require 'wezterm'
 local config = wezterm.config_builder()
 
 -- Font
-config.font_size = 15
+config.font_size = 13
 
 -- Background
 config.color_scheme = 'Gruvbox Dark (Gogh)'

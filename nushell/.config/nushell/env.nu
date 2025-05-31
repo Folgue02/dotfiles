@@ -19,8 +19,8 @@
 use std/util "path add"
 
 # Rust related
-$env.CARGO_HOME = ("~/.cargo/bin" | path expand)
+$env.CARGO_HOME = ("~/.cargo" | path expand)
 
 path add ("~/.local/bin" | path expand)
 
-$env.path ++= [($env.CARGO_HOME | path join "bin")]
+$env.path ++= [($env.CARGO_HOME | path join "bin") ("~/.spicetify" | path expand)]
