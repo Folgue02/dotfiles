@@ -1,3 +1,5 @@
 [default]
 path = "/home/folgue/Imágenes/wallpapers/"
 duration = "5m"
+sorting = "random"
+transition-time = 3000
