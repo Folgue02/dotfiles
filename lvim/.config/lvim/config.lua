@@ -27,3 +27,15 @@ vim.opt.cursorline = false
 -- Cursor
 vim.opt.guicursor = "i:block"
 
+
+-- ---------------------
+-- Disable keybinds
+-- ---------------------
+lvim.keys.insert_mode["<A-j>"] = false
+lvim.keys.insert_mode["<A-k>"] = false
+lvim.keys.normal_mode["<A-j>"] = false
+lvim.keys.normal_mode["<A-k>"] = false
+lvim.keys.visual_block_mode["<A-j>"] = false
+lvim.keys.visual_block_mode["<A-k>"] = false
+lvim.keys.visual_block_mode["J"] = false
+lvim.keys.visual_block_mode["K"] = false
