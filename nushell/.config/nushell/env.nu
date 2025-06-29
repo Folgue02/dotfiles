@@ -23,4 +23,8 @@ $env.CARGO_HOME = ("~/.cargo" | path expand)
 
 path add ("~/.local/bin" | path expand)
 
+# SDKMan java installation directory
+path add ($env.HOME | path join ".sdkman/candidates/java/current/bin/")
+
 $env.path ++= [($env.CARGO_HOME | path join "bin") ("~/.spicetify" | path expand)]
+

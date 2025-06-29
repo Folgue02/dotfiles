@@ -25,7 +25,16 @@ if (which starship | is-empty) {
 # ###############################################
 alias yay = paru
 alias gti = git
-alias gdiff = git diff
+
+# Git aliases
+alias ga = git add
+alias gc = git commit
+alias gck = git checkout
+alias gb = git branch
+alias gd = git diff
+alias gm = git merge
+alias gp = git push
+alias gpl = git pull
 
 # ###############################################
 # Startup

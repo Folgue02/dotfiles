@@ -4,7 +4,8 @@ local config = wezterm.config_builder()
 
 -- Font
 config.font_size = 13
-config.font = wezterm.font('IntoneMono Nerd Font', {})
+--config.font = wezterm.font('IntoneMono Nerd Font', {})
+config.font = wezterm.font("Agave Nerd Font", {weight="Regular", stretch="Normal", style="Normal"})
 
 -- Background
 config.color_scheme = 'Gruvbox Dark (Gogh)'
