@@ -25,6 +25,7 @@ path add ("~/.local/bin" | path expand)
 
 # SDKMan java installation directory
 path add ($env.HOME | path join ".sdkman/candidates/java/current/bin/")
+path add ($env.HOME | path join ".local/share/gem/ruby/3.4.0/bin")
 
 $env.path ++= [($env.CARGO_HOME | path join "bin") ("~/.spicetify" | path expand)]
 

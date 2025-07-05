@@ -34,6 +34,7 @@ alias gb = git branch
 alias gd = git diff
 alias gm = git merge
 alias gp = git push
+alias gs = git status
 alias gpl = git pull
 
 # ###############################################
