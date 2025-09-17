@@ -29,3 +29,6 @@ path add ($env.HOME | path join ".local/share/gem/ruby/3.4.0/bin")
 
 $env.path ++= [($env.CARGO_HOME | path join "bin") ("~/.spicetify" | path expand)]
 
+# Utils setup
+$env.UTILS_DIR = ($env.HOME | path join "source/utils/bin")
+path add $env.UTILS_DIR

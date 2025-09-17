@@ -8,8 +8,9 @@ config.font_size = 13
 config.font = wezterm.font("Agave Nerd Font", {weight="Regular", stretch="Normal", style="Normal"})
 
 -- Background
-config.color_scheme = 'Gruvbox Dark (Gogh)'
-config.window_background_opacity = 0.75
+config.color_scheme = 'Catppuccin Frappe'
+config.window_background_opacity = 0.9
+
 
 -- Enable wayland
 config.enable_wayland = true
