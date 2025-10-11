@@ -15,9 +15,9 @@ source ./commands.nu
 # Prompt configuration (if starship exists, use it)
 if (which starship | is-empty) {
 	source ./starship.nu
-} else {
-	source ./prompt.nu
 }
+source ./prompt.nu
+
 
 
 # ###############################################
