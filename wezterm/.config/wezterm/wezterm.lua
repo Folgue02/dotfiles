@@ -11,6 +11,9 @@ config.font = wezterm.font("Agave Nerd Font", {weight="Regular", stretch="Normal
 config.color_scheme = 'Catppuccin Frappe'
 config.window_background_opacity = 0.9
 
+-- Intial resolution
+config.initial_cols = 150
+config.initial_rows = 34
 
 -- Enable wayland
 config.enable_wayland = true
