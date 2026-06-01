@@ -17,4 +17,5 @@ vim.opt.rtp:prepend(lazypath)
 
 require('config.editor')
 require('config.keys')
+require('config.custom')
 require('config.lazy')
