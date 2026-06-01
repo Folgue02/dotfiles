@@ -1,5 +1,9 @@
 -- Other configs
-require('config.lsp')
+local lsp_disabled = vim.env.NVIM_LSP_DISABLED ~= nil
+
+if not lsp_disabled then
+	require('config.lsp')
+end
 
 -- Setup lazy.nvim
 require("lazy").setup({
@@ -13,8 +17,8 @@ require("lazy").setup({
 		-- Utility plugins (i.e. telescope)
 		{ import = 'config.plugins.utilities' },
 
-		-- LSP related plugins (i.e. mason)
-		{ import = 'config.plugins.lsp' },
+		-- LSP related plugins (i.e. mason) — skipped when NVIM_LSP_DISABLED is set
+		not lsp_disabled and { import = 'config.plugins.lsp' } or nil,
 	},
 	install = { colorscheme = { "kanagawa" } },
 })
