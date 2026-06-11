@@ -10,6 +10,7 @@ vim.o.signcolumn = 'yes'
 
 -- Cursor
 vim.opt.guicursor = "i-ci-ve:block"
+vim.opt.cursorline = true
 
 -- Rounded documentation popups
 vim.o.winborder = 'rounded'

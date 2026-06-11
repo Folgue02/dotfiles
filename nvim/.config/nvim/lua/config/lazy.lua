@@ -14,6 +14,9 @@ require("lazy").setup({
 		-- Miscellaneous plugins
 		{ import = 'config.plugins.misc' },
 
+		-- Completion (always active, sources adapt when LSP is disabled)
+		{ import = 'config.plugins.completion' },
+
 		-- Utility plugins (i.e. telescope)
 		{ import = 'config.plugins.utilities' },
 
